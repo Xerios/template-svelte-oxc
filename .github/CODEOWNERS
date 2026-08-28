@@ -1,0 +1,11 @@
+# Files that grant privilege or execute code. Changes here need a human who
+# knows what they are looking at, including changes an agent proposed.
+
+/.claude/            @your-org/maintainers
+/CLAUDE.md           @your-org/maintainers
+/.github/            @your-org/maintainers
+/.husky/             @your-org/maintainers
+/scripts/            @your-org/maintainers
+/pnpm-workspace.yaml @your-org/maintainers
+/pnpm-lock.yaml      @your-org/maintainers
+/package.json        @your-org/maintainers

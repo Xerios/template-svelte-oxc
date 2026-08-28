@@ -1,0 +1,46 @@
+{
+  "name": "svelte-oxc-template",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "pnpm check:types && pnpm check:lint && pnpm check:security && pnpm check:tests",
+    "check:types": "svelte-check --tsconfig ./tsconfig.json",
+    "check:lint": "oxlint --deny-warnings",
+    "check:security": "node scripts/check-security.mjs",
+    "check:tests": "vitest run",
+    "check:fmt": "oxfmt --check",
+    "test": "vitest",
+    "lint": "oxlint --fix",
+    "fmt": "oxfmt",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6.0.0",
+    "@types/node": "^22.10.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.0.0",
+    "oxfmt": "^0.65.0",
+    "oxlint": "^1.80.0",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.1.0",
+    "typescript": "^5.7.0",
+    "vite": "^7.0.0",
+    "vitest": "^3.0.0"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,mts,cts}": [
+      "oxlint --fix --no-error-on-unmatched-pattern",
+      "oxfmt --no-error-on-unmatched-pattern"
+    ],
+    "*.{svelte,json,jsonc,css,md,yml,yaml,html}": [
+      "oxfmt --no-error-on-unmatched-pattern"
+    ]
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
