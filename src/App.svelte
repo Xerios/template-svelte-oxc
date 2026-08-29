@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { createCounter } from "./lib/counter.svelte";
+  import { createCounter } from './lib/counter.svelte'
 
-  const counter = createCounter();
+  const counter = createCounter()
 </script>
 
 <main>
