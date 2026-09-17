@@ -1,4 +1,4 @@
-# svelte-oxc-template
+# template-svelte-oxc
 
 Svelte 5 + TypeScript + Vite + Vitest, linted with Oxlint, formatted with Oxfmt, packaged with pnpm, and set up for Claude Code with the Bash sandbox enabled.
 
@@ -6,8 +6,7 @@ Svelte 5 + TypeScript + Vite + Vitest, linted with Oxlint, formatted with Oxfmt,
 
 ```bash
 pnpm install
-git init            # husky needs a repo; skip if you cloned one
-pnpm exec husky     # writes .husky/_ (the "prepare" script does this on install)
+git init
 chmod +x .claude/hooks/format.sh
 pnpm dev
 ```
@@ -22,12 +21,12 @@ pnpm dev
 | `pnpm check:types` | `svelte-check`                                    |
 | `pnpm check:lint`  | `oxlint --deny-warnings`                          |
 | `pnpm check:tests` | `vitest run`                                      |
-| `pnpm check:fmt`   | `oxfmt --check` (CI only; locally it's automatic) |
+| `pnpm check:fmt`   | `oxfmt --check` (locally it's automatic)          |
 | `pnpm test`        | Vitest in watch mode                              |
 | `pnpm lint`        | `oxlint --fix`                                    |
 | `pnpm fmt`         | `oxfmt` (writes)                                  |
 
-`check:fmt` is deliberately left out of `pnpm check`. Formatting is applied automatically by the Claude Code hook and by lint-staged, so making an agent verify it is wasted work. CI still runs it as a backstop.
+`check:fmt` is deliberately left out of `pnpm check`. Formatting is applied automatically by the Claude Code hook, so making an agent verify it is wasted work.
 
 ## Formatting and linting
 
@@ -36,12 +35,6 @@ pnpm dev
 Note that Oxfmt defaults to `printWidth: 100`, not Prettier's 80. Set it explicitly in `.oxfmtrc.json` if your team wants 80.
 
 **Oxlint** replaces ESLint. It only parses the `<script>` blocks of `.svelte` files — there is no template linting, so rules like `eslint-plugin-svelte`'s markup checks have no equivalent yet. `svelte-check` covers a good part of that gap.
-
-Formatting reaches your code through three paths:
-
-1. The `PostToolUse` hook in `.claude/settings.json`, after every Claude Code edit.
-2. `lint-staged` via husky, on commit.
-3. CI, as a hard check.
 
 ## Claude Code sandbox
 
@@ -71,11 +64,7 @@ The pieces below are the ones that are not obvious from the file tree.
 
 **Supply chain.** `pnpm-workspace.yaml` carries the settings that matter more than anything else here. `allowBuilds` is an allowlist of packages permitted to run install scripts — currently just esbuild, and every addition is a package you have authorised to execute code on your machine. `minimumReleaseAge` keeps pnpm 11's one-day cooldown with `minimumReleaseAgeStrict: true` added, so a too-new version fails the install instead of silently resolving to an older one. A week is safer in principle, but in practice it blocks current releases of fast-moving tools — oxfmt and oxlint both tripped it while this template was being built. The cooldown works because detection is fast: the Shai-Hulud worm was identified in roughly twelve hours, the chalk/debug compromise in about two and a half. Use `minimumReleaseAgeExclude` for a genuine emergency patch, then remove the exception.
 
-**What the linter cannot see.** Oxlint parses only `<script>` blocks, so Svelte markup is unread by the toolchain. `scripts/check-security.mjs` covers the two cases that bite: `{@html ...}` without a sanitization note, and secret-looking names carrying the `VITE_` prefix, which Vite inlines into the client bundle. For fuller Svelte template linting, add [oxvelte](https://github.com/tolgaouz/oxvelte) alongside oxlint.
-
-**CI.** Workflow-level `permissions: contents: read`, `persist-credentials: false` on checkout, and a separate gitleaks job scanning full history. The action references are still tags — pin them to full commit SHAs before you rely on this, since a tag is a moving target controlled by someone else. Keep secrets out of any workflow that runs fork-authored code, and never pair `pull_request_target` with a checkout of PR head.
-
-**Claude Code.** The sandbox contains what a command can reach; it does nothing about prompt injection. Two things follow. Hooks run _outside_ the sandbox, so `.claude/hooks/format.sh` executes with your full privileges on every edit — CODEOWNERS covers it, and it deserves review like a CI script. And `env.CLAUDE_CODE_SUBPROCESS_ENV_SCRUB` strips Anthropic and cloud credentials from all subprocesses, sandboxed or not, which is broader than the `credentials.envVars` denies. Resist widening `allowedDomains` the first time something fails: the proxy allows by client-supplied hostname without inspecting TLS, so a broad entry is an exfiltration path. An MCP server is remote code with tool access — treat `.mcp.json` as a dependency manifest.
+**Claude Code.** The sandbox contains what a command can reach; it does nothing about prompt injection. Two things follow. Hooks run _outside_ the sandbox, so `.claude/hooks/format.sh` executes with your full privileges on every edit — it deserves review like a CI script. And `env.CLAUDE_CODE_SUBPROCESS_ENV_SCRUB` strips Anthropic and cloud credentials from all subprocesses, sandboxed or not, which is broader than the `credentials.envVars` denies. Resist widening `allowedDomains` the first time something fails: the proxy allows by client-supplied hostname without inspecting TLS, so a broad entry is an exfiltration path. An MCP server is remote code with tool access — treat `.mcp.json` as a dependency manifest.
 
 **Deploy.** `public/_headers` carries a CSP with no `unsafe-inline` for scripts, plus HSTS, `nosniff`, `Referrer-Policy`, and `Permissions-Policy`. The syntax is Netlify/Cloudflare Pages; translate it if you host elsewhere. Keep auth tokens in httpOnly SameSite cookies, not `localStorage`. And don't run `vite dev --host` on an untrusted network — the dev server has a history of path-traversal issues, so keep Vite patched even as a dev dependency.
 

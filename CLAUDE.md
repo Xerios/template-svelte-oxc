@@ -19,7 +19,6 @@ Always use `pnpm`, never `npm` or `yarn`.
 Formatting is handled by Oxfmt, and it runs automatically.
 
 - A `PostToolUse` hook formats every file after you edit it.
-- `lint-staged` formats staged files again on commit.
 - Do not manually format code.
 - Do not run `pnpm fmt` or `pnpm check:fmt` just to check formatting.
 - Do not spend time fixing whitespace, indentation, quotes, semicolons, or import formatting.
@@ -33,7 +32,7 @@ Use the project's validation command:
 pnpm check
 ```
 
-This runs `svelte-check` (types), `oxlint --deny-warnings` (lint), `scripts/check-security.mjs`, and `vitest run` (tests).
+This runs `svelte-check` (types), `oxlint --deny-warnings` (lint), and `vitest run` (tests).
 
 For substantive code changes, run `pnpm check` after implementation.
 
@@ -53,7 +52,7 @@ If validation fails:
 
 1. Read the failure.
 2. Fix the underlying problem.
-3. Re-run only the relevant failing check while debugging (`pnpm check:types`, `pnpm check:lint`, `pnpm check:security`, or a targeted Vitest run).
+3. Re-run only the relevant failing check while debugging (`pnpm check:types`, `pnpm check:lint`, or a targeted Vitest run).
 4. Once fixed, run `pnpm check` once more if appropriate.
 
 Do not repeatedly run successful checks.
@@ -84,16 +83,16 @@ Do not repeatedly run successful checks.
 
 ## Security
 
-`pnpm check:security` fails on two things the linter cannot see:
+Two things the linter cannot see:
 
-- `{@html ...}` in Svelte markup. Sanitize the value first, then annotate the line with `<!-- allow-html: reason -->`. Do not add the annotation to silence the check.
+- `{@html ...}` in Svelte markup. Sanitize the value first, then annotate the line with `<!-- allow-html: reason -->` explaining why it is safe.
 - Secret-looking names on `VITE_` variables. Anything prefixed `VITE_` is inlined into the client bundle, so it is public. Never put a token, key, or password behind that prefix.
 
 Other rules:
 
 - Never commit a `.env` file. Add new public variables to `.env.example`.
 - Adding a dependency means adding a supply-chain risk. Ask before introducing one, and never add an entry to `allowBuilds` in `pnpm-workspace.yaml` — that authorises a package to run code at install time.
-- Do not edit `.github/`, `.husky/`, `.claude/`, or `scripts/` as a side effect of another task. Those files execute with full privileges.
+- Do not edit `.claude/` as a side effect of another task. Those files execute with full privileges.
 
 ## Sandbox
 

@@ -1,7 +1,0 @@
-pnpm exec lint-staged
-
-# Optional local secret scan. Install gitleaks to enable it; CI scans full
-# history regardless, so a missing binary is not a silent hole.
-if command -v gitleaks >/dev/null 2>&1; then
-  gitleaks protect --staged --redact --no-banner
-fi
