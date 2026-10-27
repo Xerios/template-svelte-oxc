@@ -2,9 +2,6 @@
 
 ## Stack
 
-Svelte 5 (runes) + TypeScript + Vite + Vitest, managed with pnpm.
-Linting is Oxlint, formatting is Oxfmt.
-
 Always use `pnpm`, never `npm` or `yarn`.
 
 ## Scope
@@ -31,8 +28,6 @@ Use the project's validation command:
 ```bash
 pnpm check
 ```
-
-This runs `svelte-check` (types), `oxlint --deny-warnings` (lint), and `vitest run` (tests).
 
 For substantive code changes, run `pnpm check` after implementation.
 
